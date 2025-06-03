@@ -1,0 +1,36 @@
+
+appName: chat-app
+namespaceName: zakir
+containerPort: 3000
+replicaCount: 3
+
+image:
+  repository: zakir22/chat-app
+  pullPolicy: IfNotPresent
+  tag: "latest"
+
+service:
+ type: ClusterIP
+ port: 80
+
+ limits:
+  cpu: 250m
+  memory: 256Mi
+requests:
+  cpu: 500m
+  memory: 512Mi
+restartPolicy: Always
+
+secret:
+  secretName: chat-app-cert
+
+ingressClassName: nginx
+host: chat-app.rfft.nl
+path: /
+pathType: Prefix
+
+
+
+
+
+

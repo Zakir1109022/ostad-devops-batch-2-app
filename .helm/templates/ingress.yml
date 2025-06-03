@@ -1,0 +1,31 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{.values.appName}}-ingress
+  namespace: {{.values.namespaceName}}
+  annotations:
+    cert-manager.io/issuer: {{.values.appName}}-issuer
+    nginx.ingress.kubernetes.io/affinity: "cookie"
+    nginx.ingress.kubernetes.io/session-cookie-name: "chatio_session"
+    nginx.ingress.kubernetes.io/session-cookie-expires: "1h"
+    nginx.ingress.kubernetes.io/session-cookie-max-age: "1h"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+    nginx.ingress.kubernetes.io/websocket-services: {{.values.appName}}-service
+spec:
+  ingressClassName: {{.values.ingressClassName}}
+  tls:
+    - hosts:
+        - {{.values.host}}
+      secretName: {{.values.secret.secretName}}
+  rules:
+    - host: {{.values.host}}
+      http:
+        paths:
+          - pathType: {{.values.pathType}}
+            path: {{.values.path}}
+            backend:
+              service:
+                name: {{.values.appName}}-service
+                port:
+                  number: {{.values.service.port}}
