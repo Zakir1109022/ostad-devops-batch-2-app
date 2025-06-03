@@ -1,31 +1,31 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: {{.values.appName}}-ingress
-  namespace: {{.values.namespaceName}}
+  name: {{.Values.nameOverride}}-ingress
+  namespace: {{.Values.namespaceName}}
   annotations:
-    cert-manager.io/issuer: {{.values.appName}}-issuer
+    cert-manager.io/issuer: {{.Values.nameOverride}}-issuer
     nginx.ingress.kubernetes.io/affinity: "cookie"
     nginx.ingress.kubernetes.io/session-cookie-name: "chatio_session"
     nginx.ingress.kubernetes.io/session-cookie-expires: "1h"
     nginx.ingress.kubernetes.io/session-cookie-max-age: "1h"
     nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
     nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
-    nginx.ingress.kubernetes.io/websocket-services: {{.values.appName}}-service
+    nginx.ingress.kubernetes.io/websocket-services: {{.Values.nameOverride}}-service
 spec:
-  ingressClassName: {{.values.ingressClassName}}
+  ingressClassName: {{.Values.ingressClassName}}
   tls:
     - hosts:
-        - {{.values.host}}
-      secretName: {{.values.secret.secretName}}
+        - {{.Values.host}}
+      secretName: {{.Values.secret.secretName}}
   rules:
-    - host: {{.values.host}}
+    - host: {{.Values.host}}
       http:
         paths:
-          - pathType: {{.values.pathType}}
-            path: {{.values.path}}
+          - pathType: {{.Values.pathType}}
+            path: {{.Values.path}}
             backend:
               service:
-                name: {{.values.appName}}-service
+                name: {{.Values.nameOverride}}-service
                 port:
-                  number: {{.values.service.port}}
+                  number: {{.Values.service.port}}

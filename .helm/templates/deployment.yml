@@ -1,29 +1,29 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{.values.appName}}
-  namespace: {{.values.namespaceName}}
+  name: {{.Values.nameOverride}}
+  namespace: {{.Values.namespaceName}}
 spec:
-  replicas: {{.values.replicaCount}}
+  replicas: {{.Values.replicaCount}}
   selector:
     matchLabels:
-      app: {{.values.appName}}
+      app: {{.Values.nameOverride}}
   template:
     metadata:
       labels:
-        app: {{.values.appName}}
+        app: {{.Values.nameOverride}}
     spec:
       containers:
-        - name: {{.values.appName}}-container
-          image: {{.values.image}}:{{.values.image.tag}}
-          imagePullPolicy: {{.values.imagePullPolicy}}
+        - name: {{.Values.nameOverride}}-container
+          image: {{.Values.image.repository}}:{{.Values.image.tag}}
+          imagePullPolicy: {{.Values.image.imagePullPolicy}}
           ports:
-            - containerPort: {{.values.containerPort}}
+            - containerPort: {{.Values.containerPort}}
           resources:
             requests:
-              cpu: {{.values.requests.cpu}}
-              memory: {{.values.requests.memory}}
+              cpu: {{.Values.requests.cpu}}
+              memory: {{.Values.requests.memory}}
             limits:
-              cpu: {{.values.limits.cpu}}
-              memory: {{.values.limits.memory}}
-      restartPolicy: {{.values.restartPolicy}}
+              cpu: {{.Values.limits.cpu}}
+              memory: {{.Values.limits.memory}}
+      restartPolicy: {{.Values.restartPolicy}}

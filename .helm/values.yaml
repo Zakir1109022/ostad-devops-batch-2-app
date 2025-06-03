@@ -1,8 +1,7 @@
-
-appName: chat-app
-namespaceName: zakir
-containerPort: 3000
 replicaCount: 3
+nameOverride: "chat-app-helm"
+namespaceName: "zakir-helm"
+containerPort: 3000
 
 image:
   repository: zakir22/chat-app
@@ -13,19 +12,19 @@ service:
  type: ClusterIP
  port: 80
 
- limits:
+requests:
   cpu: 250m
   memory: 256Mi
-requests:
+limits:
   cpu: 500m
   memory: 512Mi
 restartPolicy: Always
 
 secret:
-  secretName: chat-app-cert
+  secretName: chat-app-cert-helm
 
 ingressClassName: nginx
-host: chat-app.rfft.nl
+host: rapid-app.rfft.nl
 path: /
 pathType: Prefix
 
