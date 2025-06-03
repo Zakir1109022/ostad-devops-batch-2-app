@@ -1,0 +1,99 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: zakir
+  
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: chat-app
+  namespace: zakir
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: chat-app
+  template:
+    metadata:
+      labels:
+        app: chat-app
+    spec:
+      containers:
+        - name: chat-app-container
+          image: zakir22/chat-app:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 3000
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "256Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+      restartPolicy: Always
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: chat-app-service
+  namespace: zakir
+spec:
+  type: ClusterIP
+  selector:
+    app: chat-app
+  ports:
+    - port: 80
+      targetPort: 3000
+
+---
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: chat-app-issuer
+  namespace: zakir
+spec:
+  acme:
+    server: https://acme-v02.api.letsencrypt.org/directory
+    email: zakirhasan1109022@gmail.com
+    privateKeySecretRef:
+      name: chat-app-issuer
+    solvers:
+      - http01:
+          ingress:
+            ingressClassName: nginx
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: chat-app-ingress
+  namespace: zakir
+  annotations:
+    cert-manager.io/issuer: chat-app-issuer
+    nginx.ingress.kubernetes.io/affinity: "cookie"
+    nginx.ingress.kubernetes.io/session-cookie-name: "chatio_session"
+    nginx.ingress.kubernetes.io/session-cookie-expires: "1h"
+    nginx.ingress.kubernetes.io/session-cookie-max-age: "1h"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+    nginx.ingress.kubernetes.io/websocket-services: "chat-app-service"
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - chat-app.rfft.nl
+      secretName: chat-app-cert
+  rules:
+    - host: "chat-app.rfft.nl"
+      http:
+        paths:
+          - pathType: Prefix
+            path: "/"
+            backend:
+              service:
+                name: chat-app-service
+                port:
+                  number: 80
